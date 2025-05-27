@@ -1,5 +1,6 @@
 package com.algaworks.algasensors.ems_device_management;
 
+import com.algaworks.algasensors.ems_device_management.common.IDGenerator;
 import io.hypersistence.tsid.TSID;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ public class TSIDTest {
         System.out.println("O instante no qual o TSID foi gerado " + tsid.getInstant());*/
 
 
-            TSID tsid = IdGenerator.generateTSID();
+            TSID tsid = IDGenerator.generateTSID();
             Assertions.assertThat(tsid.getInstant())
                     .isCloseTo(Instant.now(), Assertions.within(1, ChronoUnit.MINUTES));
     }

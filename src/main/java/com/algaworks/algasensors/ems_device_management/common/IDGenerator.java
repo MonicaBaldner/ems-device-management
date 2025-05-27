@@ -1,10 +1,10 @@
-package com.algaworks.algasensors.ems_device_management;
+package com.algaworks.algasensors.ems_device_management.common;
 
 import io.hypersistence.tsid.TSID;
 
 import java.util.Optional;
 
-public class IdGenerator {
+public class IDGenerator {
 
     private static final TSID.Factory tsidFactory;
 
@@ -18,7 +18,7 @@ public class IdGenerator {
         tsidFactory = TSID.Factory.builder().build();
     }
 
-    private IdGenerator() {
+    private IDGenerator() {
 
     }
 
