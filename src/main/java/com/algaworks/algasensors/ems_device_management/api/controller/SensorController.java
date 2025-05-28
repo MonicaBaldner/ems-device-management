@@ -1,6 +1,9 @@
 package com.algaworks.algasensors.ems_device_management.api.controller;
 
+import com.algaworks.algasensors.ems_device_management.api.client.SensorMonitoringClient;
+import com.algaworks.algasensors.ems_device_management.api.model.SensorDetailOutput;
 import com.algaworks.algasensors.ems_device_management.api.model.SensorInput;
+import com.algaworks.algasensors.ems_device_management.api.model.SensorMonitoringOutput;
 import com.algaworks.algasensors.ems_device_management.api.model.SensorOutput;
 import com.algaworks.algasensors.ems_device_management.common.IDGenerator;
 import com.algaworks.algasensors.ems_device_management.domain.model.Sensor;
@@ -21,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class SensorController {
 
     private final SensorRepository sensorRepository; //10.04
+    private final SensorMonitoringClient sensorMonitoringClient; //11.02
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -85,6 +89,7 @@ public SensorOutput update(@PathVariable TSID sensorId,
         Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         sensorRepository.delete(sensor);
+        sensorMonitoringClient.disableMonitoring(sensorId); //11.02
     }
 //fim aula 10.09
 
@@ -96,6 +101,7 @@ public SensorOutput update(@PathVariable TSID sensorId,
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         sensor.setEnabled(true);
         sensorRepository.save(sensor);
+        sensorMonitoringClient.enableMonitoring(sensorId); //11.02
     }
 
     @DeleteMapping("/{sensorId}/enable")
@@ -105,8 +111,26 @@ public SensorOutput update(@PathVariable TSID sensorId,
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         sensor.setEnabled(false);
         sensorRepository.save(sensor);
+        sensorMonitoringClient.disableMonitoring(sensorId); //11.02
     }
 //Fim aula 10.10
+
+    //11.06
+    @GetMapping("{sensorId}/detail")
+    public SensorDetailOutput getOneWithDetail(@PathVariable TSID sensorId) {
+        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        SensorMonitoringOutput monitoringOuput = sensorMonitoringClient.getDetail(sensorId);
+        SensorOutput sensorOutput = convertToModel(sensor);
+
+        return SensorDetailOutput.builder()
+                .monitoring(monitoringOuput)
+                .sensor(sensorOutput)
+                .build();
+    }
+//Fim 11.06
+
 
 
     private SensorOutput convertToModel(Sensor sensor) {
